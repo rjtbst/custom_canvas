@@ -1,12 +1,13 @@
+"use client";
 import { useState } from "react";
 import { Slider } from "@/components/ui/slider";
-import { useNavigate } from "react-router-dom";
+import { useRouter} from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { edit_templates, TypeEditTemplate } from "@/lib/constant";
+import { edit_templates, TypeEditTemplate } from "@lib/constants";
 import ImageRevealSlider from "../ui/ImageRevealSlider";
 
 const TemplateGrid = () => {
-  const navigate = useNavigate();
+  const router = useRouter();
   const handleTemplateClick = (template: TypeEditTemplate) => {
     const requestParams = {
       imageId: template.id,
@@ -16,7 +17,7 @@ const TemplateGrid = () => {
     const params = new URLSearchParams({
       requestParams: JSON.stringify(requestParams),
     });
-    navigate(`/edit?${params.toString()}`);
+    router.push(`/create?${params.toString()}`);
   };
 
   return (
@@ -55,8 +56,8 @@ const BeforeAfter = () => {
   const [sliderValue, setSliderValue] = useState([50]);
 
   // Mock before/after images - in real app these would be actual images
-  const beforeImage = "/images/restore_before.jpeg";
-  const afterImage = "/images/restore_after.png";
+  const beforeImage = "/images/repair_before.jpeg";
+  const afterImage = "/images/repair_after.png";
 
   return (
     <section className=" bg-warm-white">

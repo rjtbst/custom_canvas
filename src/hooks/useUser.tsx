@@ -1,19 +1,15 @@
-'use client';
 import { useEffect, useState, createContext, useContext } from 'react';
 import {
   useUser as useSupaUser,
   useSessionContext,
   User
 } from '@supabase/auth-helpers-react';
-import { UserDetails, Subscription } from '../../types';
+import { UserDetails } from '../../types';
+import { Subscription } from '../../types';
 import axios from 'axios';
-import { Mixpanel, MixpanelEvents } from '@/lib/mixpanel';
-
-declare global {
-  interface Window {
-    tolt_param?: any;
-  }
-}
+// import { redis } from 'lib/redis';
+// import { Mixpanel, MixpanelEvents } from 'lib/mixpanel';
+// import { sleep } from './helpers';
 
 type UserContextType = {
   accessToken: string | null;
@@ -26,12 +22,12 @@ type UserContextType = {
   getTokenBalance: () => void;
   handlingNewUser: boolean;
   refetchUserDetails: () => void;
-  getFeatureAccess: () => void;
-  featureAccessData: {
-    userTier: string;
-    amount: number;
-    featureAccess: string[];
-  } | null;
+  // getFeatureAccess: () => void;
+  // featureAccessData: {
+  //   userTier: string;
+  //   amount: number;
+  //   featureAccess: string[];
+  // } | null;
 };
 
 export const UserContext = createContext<UserContextType | undefined>(
@@ -55,43 +51,36 @@ export const MyUserContextProvider = (props: Props) => {
   const [subscription, setSubscription] = useState<Subscription | null>(null);
   const [tokenBalance, setTokenBalance] = useState<number | null>(null);
   const [handlingNewUser, setHandlingNewUser] = useState(false);
-  const [featureAccessData, setFeatureAccessData] = useState<{
-    userTier: string;
-    amount: number;
-    featureAccess: string[];
-  } | null>(null);
-
+  // const [featureAccessData, setFeatureAccessData] = useState<string[] | null>(null);
   const getTokenBalance = async () => {
-    const {
-      data: { tokenBalance }
-    } = await axios.get('/api/a1_request/token_balance');
-    setTokenBalance(tokenBalance);
+    // const {
+    //   data: { tokenBalance }
+    // } = await axios.get('/api/a1_request/token_balance');
+    setTokenBalance(10);
   };
-
-  const getFeatureAccess = async () => {
-    try {
-      const { data } = await axios.get('/api/users/feature_access');
-      setFeatureAccessData(data);  // Set the fetched featureAccess in state
-    } catch (error) {
-      console.error('Error fetching feature access:', error);
-    }
-  };
-
+  // const getFeatureAccess = async () => {
+  //   try {
+  //     const { data } = await axios.get('/api/users/feature_access');
+  //     setFeatureAccessData(data);  // Set the fetched featureAccess in state
+  //   } catch (error) {
+  //     console.error('Error fetching feature access:', error);
+  //   }
+  // };
   useEffect(() => {
     if (user?.id) {
       getTokenBalance();
     }
   }, [user?.id]);
 
-  useEffect(() => {
-    if (user?.id) {
-      getFeatureAccess(); 
-    }
-  }, [user?.id]);
+  // useEffect(() => {
+  //   if (user?.id) {
+  //     getFeatureAccess(); 
+  //   }
+  // }, [user?.id]);
 
   const loadUser = async () => {
     const { data: userDetailData } = await supabase
-      .from('users')
+      .from('profiles')
       .select('*')
       .single();
     setUserDetails(userDetailData);
@@ -113,10 +102,10 @@ export const MyUserContextProvider = (props: Props) => {
     ) {
       try {
         setHandlingNewUser(true);
-        const { status } = await axios.post('/api/users/handle_new_user', {
-          // ip_address,
-          tolt_param: window?.tolt_param
-        });
+        // const { status } = await axios.post('/api/users/handle_new_user', {
+        //   // ip_address,
+        //   tolt_param: window?.tolt_param
+        // });
         await getTokenBalance();
         setHandlingNewUser(false);
       } catch (error) {
@@ -128,22 +117,22 @@ export const MyUserContextProvider = (props: Props) => {
 
   const refetchUserDetails = async () => {
     setIsloadingData(true);
-    await getFeatureAccess();
+    // await getFeatureAccess();
     await loadUser();
     await getTokenBalance();
     setIsloadingData(false);
   };
 
-  useEffect(() => {
-    if (user?.id) {
-      Mixpanel.identify(user.id);
-      Mixpanel.track(MixpanelEvents['API Response'], {
-        action: 'user_logged_in'
-      });
+  // useEffect(() => {
+  //   if (user?.id) {
+  //     Mixpanel.identify(user.id);
+  //     Mixpanel.track(MixpanelEvents['API Response'], {
+  //       action: 'user_logged_in'
+  //     });
 
-      loadUser();
-    }
-  }, [user?.id]);
+  //     loadUser();
+  //   }
+  // }, [user?.id]);
 
   const value = {
     accessToken,
@@ -154,10 +143,10 @@ export const MyUserContextProvider = (props: Props) => {
     tokenBalance,
     setTokenBalance,
     getTokenBalance,
-    getFeatureAccess,
+    // getFeatureAccess,
     handlingNewUser,
     refetchUserDetails,
-    featureAccessData
+    // featureAccessData
   };
 
   return <UserContext.Provider value={value} {...props} />;

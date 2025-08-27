@@ -1,4 +1,4 @@
-'use client'
+'use client';
 import * as React from "react";
 import { Slot } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";
@@ -56,6 +56,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 
     return (
       <Comp
+      suppressHydrationWarning
         ref={combinedRef}
         className={cn(buttonVariants({ variant, size, className }))}
         style={{ width: width, ...props.style }}

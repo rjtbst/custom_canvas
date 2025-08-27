@@ -9,18 +9,18 @@ export const metadata = {
   description: "Create your own custom canvas with ease",
 };
 
-export default function Layout({ children }: { children: React.ReactNode }) {
+
+export default function RootLayout({ children }:{children: React.ReactNode}) {
   return (
-    <html lang="en" data-theme='mytheme'>
+    <html>
       <body>
-        <div className="bg-base-100 min-h-screen">
         <Providers>
-          <Navbar/>
           {children}
           <Footer/>
         </Providers>
-        </div>
+        
       </body>
     </html>
   );
 }
+

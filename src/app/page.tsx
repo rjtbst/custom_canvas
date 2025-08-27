@@ -26,13 +26,16 @@ const router = useRouter();
   return (
     <main className="min-h-screen flex flex-col gap-20">
      
+     
       <Hero />
-      {/* <HowItWorks />
+      <HowItWorks />
        <BeforeAfter />
       <EditingFeatures />
      
       <PrintOptions />
-      <FinalCTA /> */}
+      <FinalCTA />
+      
+
       
     </main>
   );

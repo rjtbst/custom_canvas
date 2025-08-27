@@ -141,6 +141,7 @@ export default function ImageRevealSlider({
 
         {/* Handle */}
         <motion.button
+        suppressHydrationWarning
           type="button"
           aria-label="Drag to reveal"
           role="slider"
