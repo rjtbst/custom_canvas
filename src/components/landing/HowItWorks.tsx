@@ -1,5 +1,4 @@
 import { Upload, Palette, Truck } from "lucide-react";
-import processIcons from "@/assets/process-icons.jpg";
 
 const HowItWorks = () => {
   const steps = [

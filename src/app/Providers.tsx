@@ -5,6 +5,7 @@ import { createPagesBrowserClient } from "@supabase/auth-helpers-nextjs";
 import { useState } from "react";
 import { MyUserContextProvider } from "../hooks/useUser";
 import { Toaster } from "react-hot-toast";
+import Navbar from "./Navbar";
 
 export function Providers({ children }: { children: React.ReactNode }) {
   const [supabase] = useState(() => createPagesBrowserClient());
@@ -12,6 +13,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <SessionContextProvider supabaseClient={supabase}>
       <MyUserContextProvider>
+        <Navbar/>
         {children}
         <Toaster
           position="top-right"

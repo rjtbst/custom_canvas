@@ -1,3 +1,4 @@
+"use client"
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -83,7 +84,7 @@ const PrintOptions = () => {
           <div className="fade-in-left">
             <div className="relative rounded-2xl overflow-hidden shadow-2xl mb-6">
               <img 
-                src={galleryWall} 
+                src={galleryWall.src} 
                 alt="Beautiful gallery wall showing various canvas prints and framed photos in a modern living room"
                 className="w-full h-auto"
               />
@@ -123,7 +124,7 @@ const PrintOptions = () => {
               <h3 className="text-xl font-semibold text-navy">Choose Print Type</h3>
               <div className="grid grid-cols-1 gap-3">
                 {categories.map((category) => (
-                  <button
+                  <Button
                     key={category.id}
                     onClick={() => setSelectedCategory(category.id)}
                     className={`p-4 rounded-xl border-2 transition-all text-left ${
@@ -144,7 +145,7 @@ const PrintOptions = () => {
                         <Check className="w-5 h-5 text-accent ml-auto" />
                       )}
                     </div>
-                  </button>
+                  </Button>
                 ))}
               </div>
             </div>
@@ -154,8 +155,9 @@ const PrintOptions = () => {
               <h3 className="text-xl font-semibold text-navy">Select Size</h3>
               <div className="grid grid-cols-3 gap-3">
                 {(selectedCategory === "canvas" ? canvasOptions.sizes : photoOptions.sizes).map((size) => (
-                  <button
+                  <Button
                     key={size.id}
+                    variant={"outline"}
                     onClick={() => setSelectedSize(size.id)}
                     className={`p-4 rounded-xl border-2 transition-all text-center ${
                       selectedSize === size.id
@@ -166,7 +168,7 @@ const PrintOptions = () => {
                     <div className="font-medium text-navy text-sm">{size.name}</div>
                     <div className="text-xs text-muted-foreground">{size.dimensions}"</div>
                     <div className="text-sm font-semibold text-accent mt-2">₹{size.price}</div>
-                  </button>
+                  </Button>
                 ))}
               </div>
             </div>

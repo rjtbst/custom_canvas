@@ -107,7 +107,8 @@ const Footer = () => {
               </p>
             </div>
             <div className="flex gap-3">
-              <Input
+              <input
+              suppressHydrationWarning
                 type="email"
                 placeholder="Enter your email"
                 className="flex-1 px-4 py-2 rounded-lg border border-border focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"

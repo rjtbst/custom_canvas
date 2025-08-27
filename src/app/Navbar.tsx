@@ -21,31 +21,18 @@ import { useRouter, usePathname } from "next/navigation";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 
 const Navbar = () => {
-  const { user, tokenBalance } = useUser();
+  const { user, isLoading } = useUser();
+  const tokenBalance = 10;
+  console.log("user*****************",user)
   const router = useRouter();
   const pathname = usePathname();
 
   const [open, setOpen] = useState(false);
-
-  useEffect(() => {
-    if (user) {
-      Mixpanel.identify(user.id);
-      Mixpanel.people.set({
-        $email: user.email,
-        $id: user.id,
-        $created: user.created_at,
-        $last_login: new Date(),
-      });
-      // disable in dev/test env if needed
-      Hotjar.identify(user.id, {
-        signed_up_date: user.created_at,
-      });
-    }
-  }, [user]);
-
+  
+if (isLoading) return null;
   const navigation = user?.id
     ? [
-        { name: "Editor", href: "/editor" },
+        { name: "Create", href: "/create" },
         { name: "Checkout", href: "/checkout" },
         { name: "Orders", href: "/orders" },
         { name: "Profile", href: "/profile" },
@@ -60,7 +47,9 @@ const Navbar = () => {
       ];
 
   return (
-    <nav className="w-full border-b bg-transparent backdrop-blur-sm fixed top-0 z-50">
+    <nav className="w-full border-b bg-transparent backdrop-blur-sm fixed top-0 z-50"
+    data-aria-hidden="true" area-hidden="true"
+    >
       <div className="max-w-7xl mx-auto flex items-center justify-between h-16 px-6">
         {/* Logo */}
         <Link href="/" className="font-bold text-xl text-primary">

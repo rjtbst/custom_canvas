@@ -132,7 +132,7 @@ export default function LoginDrawer({
             await supabase.auth.signOut();
             router.push("/signin");
           } else {
-            const redirectTo = searchParams.get("redirect") || "/edit";
+            const redirectTo = searchParams.get("redirect") || "/create";
             Mixpanel.track(MixpanelEvents["API Response"], {
               action: "sign_in_success",
               path: "/signin",
@@ -155,7 +155,7 @@ export default function LoginDrawer({
       data: { session },
     } = await supabase.auth.getSession();
     if (session?.user) {
-      const redirectTo = searchParams.get("redirect") || "/edit";
+      const redirectTo = searchParams.get("redirect") || "/create";
       router.replace(redirectTo.toString());
     }
   };
@@ -210,7 +210,7 @@ export default function LoginDrawer({
       email,
       password,
       options: {
-        data: { ip_address: ipAddress, tolt_param: window?.tolt_param },
+        data: { ip_address: ipAddress},
         emailRedirectTo: redirectToURL,
       },
     });
