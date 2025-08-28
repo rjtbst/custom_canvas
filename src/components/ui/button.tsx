@@ -52,7 +52,7 @@ export interface ButtonProps
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant, size, asChild = false, active, width, loading = false, Component, children, ...props }, ref) => {
     const Comp = asChild ? Slot : Component || "button";
-    const combinedRef = mergeRefs([ref as any]);
+    const combinedRef = mergeRefs([ref as React.Ref<HTMLButtonElement>]);
 
     return (
       <Comp

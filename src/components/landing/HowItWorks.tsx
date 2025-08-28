@@ -1,6 +1,7 @@
 import { Upload, Palette, Truck } from "lucide-react";
 
 const HowItWorks = () => {
+  console.log("HowItWorks************************")
   const steps = [
     {
       number: "01",

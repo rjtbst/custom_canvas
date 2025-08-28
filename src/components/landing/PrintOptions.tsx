@@ -83,7 +83,8 @@ const PrintOptions = () => {
           {/* Gallery Preview */}
           <div className="fade-in-left">
             <div className="relative rounded-2xl overflow-hidden shadow-2xl mb-6">
-              <img 
+              <img
+
                 src={galleryWall.src} 
                 alt="Beautiful gallery wall showing various canvas prints and framed photos in a modern living room"
                 className="w-full h-auto"
@@ -166,7 +167,7 @@ const PrintOptions = () => {
                     }`}
                   >
                     <div className="font-medium text-navy text-sm">{size.name}</div>
-                    <div className="text-xs text-muted-foreground">{size.dimensions}"</div>
+                    <div className="text-xs text-muted-foreground">{size.dimensions}</div>
                     <div className="text-sm font-semibold text-accent mt-2">₹{size.price}</div>
                   </Button>
                 ))}

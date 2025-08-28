@@ -1,6 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Instagram, Facebook, Twitter, Mail, Phone, MapPin } from "lucide-react";
-import { Input } from "../ui/input";
+import { Instagram, Facebook, Twitter, Mail, MapPin } from "lucide-react";
 
 const Footer = () => {
   const footerLinks = {

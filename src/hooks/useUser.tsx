@@ -1,161 +1,92 @@
-import { useEffect, useState, createContext, useContext } from 'react';
-import {
-  useUser as useSupaUser,
-  useSessionContext,
-  User
-} from '@supabase/auth-helpers-react';
-import { UserDetails } from '../../types';
-import { Subscription } from '../../types';
-import axios from 'axios';
-// import { redis } from 'lib/redis';
-// import { Mixpanel, MixpanelEvents } from 'lib/mixpanel';
-// import { sleep } from './helpers';
+"use client";
+
+import { createContext, useContext, useEffect, useState } from "react";
+import { createClient } from "@/utils/supabase/client";
+import type { User } from "@supabase/supabase-js";
+import type { UserDetails, Subscription } from "../../types";
 
 type UserContextType = {
-  accessToken: string | null;
   user: User | null;
   userDetails: UserDetails | null;
-  isLoading: boolean;
   subscription: Subscription | null;
   tokenBalance: number | null;
+  loading: boolean;
   setTokenBalance: (balance: number) => void;
-  getTokenBalance: () => void;
-  handlingNewUser: boolean;
   refetchUserDetails: () => void;
-  // getFeatureAccess: () => void;
-  // featureAccessData: {
-  //   userTier: string;
-  //   amount: number;
-  //   featureAccess: string[];
-  // } | null;
 };
 
-export const UserContext = createContext<UserContextType | undefined>(
-  undefined
-);
+const UserContext = createContext<UserContextType | undefined>(undefined);
 
-export interface Props {
-  [propName: string]: any;
-}
-
-export const MyUserContextProvider = (props: Props) => {
-  const {
-    session,
-    isLoading: isLoadingUser,
-    supabaseClient: supabase
-  } = useSessionContext();
-  const user = useSupaUser();
-  const accessToken = session?.access_token ?? null;
-  const [isLoadingData, setIsloadingData] = useState(false);
+export const UserProvider = ({ children }: { children: React.ReactNode }) => {
+  const [user, setUser] = useState<User | null>(null);
   const [userDetails, setUserDetails] = useState<UserDetails | null>(null);
   const [subscription, setSubscription] = useState<Subscription | null>(null);
   const [tokenBalance, setTokenBalance] = useState<number | null>(null);
-  const [handlingNewUser, setHandlingNewUser] = useState(false);
-  // const [featureAccessData, setFeatureAccessData] = useState<string[] | null>(null);
+  const [loading, setLoading] = useState(true);
+
   const getTokenBalance = async () => {
-    // const {
-    //   data: { tokenBalance }
-    // } = await axios.get('/api/a1_request/token_balance');
+    // Replace this with actual API call
     setTokenBalance(10);
   };
-  // const getFeatureAccess = async () => {
-  //   try {
-  //     const { data } = await axios.get('/api/users/feature_access');
-  //     setFeatureAccessData(data);  // Set the fetched featureAccess in state
-  //   } catch (error) {
-  //     console.error('Error fetching feature access:', error);
-  //   }
-  // };
-  useEffect(() => {
-    if (user?.id) {
-      getTokenBalance();
-    }
-  }, [user?.id]);
-
-  // useEffect(() => {
-  //   if (user?.id) {
-  //     getFeatureAccess(); 
-  //   }
-  // }, [user?.id]);
-
+   
+  const supabase = createClient();
   const loadUser = async () => {
+    
+    const { data: sessionUser } = await supabase.auth.getUser();
+    setUser(sessionUser?.user ?? null);
+
+    if (!sessionUser?.user) {
+      setLoading(false);
+      return;
+    }
+  console.log("session user in use user ************", sessionUser)
+    // Fetch profile and subscription
     const { data: userDetailData } = await supabase
-      .from('profiles')
-      .select('*')
+      .from("profiles")
+      .select("*")
+      .eq("id", sessionUser.user.id)
       .single();
+
     setUserDetails(userDetailData);
+
     const { data: subData } = await supabase
-      .from('subscriptions')
-      .select('*, prices(*, products(*))')
-      .in('status', ['trialing', 'active']);
-    if (subData && Array.isArray(subData) && subData.length > 0) {
-      setSubscription(subData[0]);
-    }
-    const {
-      new_user_email_sent_at,
-      new_user_offer_checked_at,
-      email_confirmed_at
-    } = userDetailData || {};
-    if (
-      email_confirmed_at &&
-      (!new_user_email_sent_at || !new_user_offer_checked_at)
-    ) {
-      try {
-        setHandlingNewUser(true);
-        // const { status } = await axios.post('/api/users/handle_new_user', {
-        //   // ip_address,
-        //   tolt_param: window?.tolt_param
-        // });
-        await getTokenBalance();
-        setHandlingNewUser(false);
-      } catch (error) {
-        setHandlingNewUser(false);
-        console.log(error);
-      }
-    }
+      .from("subscriptions")
+      .select("*, prices(*, products(*))")
+      .in("status", ["trialing", "active"]);
+
+    setSubscription(subData?.[0] ?? null);
+
+    await getTokenBalance();
+    setLoading(false);
   };
+
+  useEffect(() => {
+    loadUser();
+
+    // Listen to auth state changes (login, logout)
+    const { data: listener } = supabase.auth.onAuthStateChange(() => {
+      loadUser();
+    });
+
+    return () => listener.subscription.unsubscribe();
+  }, []);
 
   const refetchUserDetails = async () => {
-    setIsloadingData(true);
-    // await getFeatureAccess();
+    setLoading(true);
     await loadUser();
-    await getTokenBalance();
-    setIsloadingData(false);
   };
 
-  // useEffect(() => {
-  //   if (user?.id) {
-  //     Mixpanel.identify(user.id);
-  //     Mixpanel.track(MixpanelEvents['API Response'], {
-  //       action: 'user_logged_in'
-  //     });
-
-  //     loadUser();
-  //   }
-  // }, [user?.id]);
-
-  const value = {
-    accessToken,
-    user,
-    userDetails,
-    isLoading: isLoadingUser || isLoadingData,
-    subscription,
-    tokenBalance,
-    setTokenBalance,
-    getTokenBalance,
-    // getFeatureAccess,
-    handlingNewUser,
-    refetchUserDetails,
-    // featureAccessData
-  };
-
-  return <UserContext.Provider value={value} {...props} />;
+  return (
+    <UserContext.Provider
+      value={{ user, userDetails, subscription, tokenBalance, loading, setTokenBalance, refetchUserDetails }}
+    >
+      {children}
+    </UserContext.Provider>
+  );
 };
 
 export const useUser = () => {
   const context = useContext(UserContext);
-  if (context === undefined) {
-    throw new Error(`useUser must be used within a MyUserContextProvider.`);
-  }
+  if (!context) throw new Error("useUser must be used inside UserProvider");
   return context;
 };

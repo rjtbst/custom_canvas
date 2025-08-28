@@ -1,37 +1,40 @@
+import { createServerClient } from "@/utils/supabase/apiServiceServer";
 import { NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
 import { v4 as uuidv4 } from "uuid";
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY! 
-);
 
 export async function POST(req: Request) {
   try {
+  const supabase = createServerClient()
     const formData = await req.formData();
     const file = formData.get("file") as File;
     const userId = formData.get("userId") as string;
-
-    if (!file || !userId) {
-      return NextResponse.json({ error: "Missing file or userId" }, { status: 400 });
+    if (!file) {
+      return NextResponse.json({ error: "Missing file" }, { status: 400 });
     }
 
     const filePath = `${userId}/${uuidv4()}-${file.name}`;
 
-    const { error } = await supabase.storage.from("uploads").upload(filePath, file);
+    // Upload
+    const { error: uploadError } = await supabase.storage
+      .from("file_upload")
+      .upload(filePath, file);
 
-    if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
+    if (uploadError) {
+      return NextResponse.json({ error: uploadError.message }, { status: 500 });
     }
 
-    // return signed url (private bucket)
-    const { data: signed } = await supabase.storage
-      .from("uploads")
-      .createSignedUrl(filePath, 60 * 60); // 1 hour
+    // Create signed URL
+    const { data: signed, error: signedError } = await supabase.storage
+      .from("file_upload")
+      .createSignedUrl(filePath, 3600);
+
+    if (signedError) {
+      return NextResponse.json({ error: signedError.message }, { status: 500 });
+    }
 
     return NextResponse.json({ url: signed?.signedUrl });
   } catch (err) {
+    console.error("Upload error:", err);
     return NextResponse.json({ error: "Upload failed" }, { status: 500 });
   }
 }

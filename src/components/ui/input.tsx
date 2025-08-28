@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 
 interface InputProps extends React.ComponentProps<"input"> {
   // optional custom props if needed
+  disabled?: boolean;
 }
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(

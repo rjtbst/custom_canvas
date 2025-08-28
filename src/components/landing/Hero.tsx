@@ -5,6 +5,7 @@ import { useTypingEffect } from "@/hooks/useTypingEffect";
 import Image from "next/image";
 
 const Hero = () => {
+  console.log("hero***************")
   const { displayedText: typedTitle, isComplete } = useTypingEffect({
     text: "Turn Your Memories into Stunning Art & Canvas Prints",
     speed: 80,
