@@ -7,6 +7,7 @@ import BeforeAfter from "@/components/landing/BeforeAfter";
 import EditingFeatures from "@/components/landing/EditingFeatures";
 import PrintOptions from "@/components/landing/PrintOptions";
 import FinalCTA from "@/components/landing/FinalCTA";
+import Footer from "@/components/landing/Footer";
 
 const LandingPage = () => {
   useScrollAnimation();
@@ -19,13 +20,14 @@ const LandingPage = () => {
     };
   }, []);
   return (
-    <main className="min-h-screen flex flex-col gap-20">
+    <main className="min-h-screen -mt-16 flex flex-col gap-20">
       <Hero />
       <HowItWorks />
       <BeforeAfter />
-      <EditingFeatures />
+      {/* <EditingFeatures /> */}
       <PrintOptions />
       <FinalCTA />
+        <Footer />
     </main>
   );
 };

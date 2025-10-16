@@ -22,12 +22,14 @@ export default function Navbar() {
     { name: "Create", href: "/create", authRequired: true },
     { name: "Orders", href: "/orders", authRequired: true },
     { name: "Account", href: "/account", authRequired: true },
-    { name: "About", href: "/about" },
-    { name: "Contact", href: "/contact" },
+      //  { name: "Blogs", href: "/blogs", authRequired: true },
+
+    { name: "About", href: "/about", authRequired: true  },
+    { name: "Contact", href: "/contact", authRequired: true  },
   ];
 
   return (
-    <nav className="w-full border-b fixed top-0 z-50 bg-transparent backdrop-blur-sm">
+    <nav className="fixed top-0 left-0 w-full z-50 h-16  hero-gradient shadow-sm  ">
       <div className="max-w-7xl mx-auto flex items-center justify-between h-16 px-6">
         {/* Logo */}
         <Link href="/" className="font-bold text-xl text-primary">

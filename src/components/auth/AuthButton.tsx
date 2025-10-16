@@ -5,10 +5,11 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { LogoutButton } from "@/components/ui/LogoutButton";
 import { createClient } from "@/utils/supabase/client";
+import { User } from "@supabase/supabase-js";
 
 export function AuthButton() {
   const supabase = createClient();
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
     // get initial user on mount
@@ -26,7 +27,7 @@ export function AuthButton() {
     return (
       <div className="flex items-center gap-4">
         <span className="text-sm text-muted-foreground">
-          Hey, {user.email}!
+          Hey, {user?.email}!
         </span>
         <LogoutButton />
       </div>

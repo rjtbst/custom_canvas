@@ -3,10 +3,10 @@ import { useState } from "react";
 import { Slider } from "@/components/ui/slider";
 import { useRouter} from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { edit_templates, TypeEditTemplate } from "@lib/constants";
+import { edit_templates, TypeEditTemplate } from "../../lib/constants";
 import ImageRevealSlider from "../ui/ImageRevealSlider";
 
-const TemplateGrid = () => {
+export const TemplateGrid = () => {
   const router = useRouter();
   const handleTemplateClick = (template: TypeEditTemplate) => {
     const requestParams = {
@@ -21,18 +21,19 @@ const TemplateGrid = () => {
   };
 
   return (
-    <div className="mt-14 flex flex-col justify-center items-center">
-      <div className="grid grid-cols-1 sm:grid-cols-2  md:grid-cols-3 gap-x-8 gap-y-8 p-6">
-        {edit_templates.map((template) => (
+    <div className="mt-14  flex flex-col justify-center items-center">
+      <div className="grid w-full  grid-cols-1 sm:grid-cols-2  md:grid-cols-4 gap-x-8 gap-y-8 p-6">
+        {edit_templates.slice(0, 8).map((template) => (
           <div
             key={template.id}
             className="flex flex-col  overflow-hidden justify-center cursor-pointer  transition-shadow"
             // onClick={() => handleTemplateClick(template)}
           >
             <ImageRevealSlider
+            showSliderButton={true}
               beforeSrc={template.image[0]}
               afterSrc={template.image[1]}
-              className=" rounded-3xl"
+              className=" rounded-3xl "
             />
             <div className="px-3">
               <Button
@@ -100,15 +101,7 @@ const BeforeAfter = () => {
                 }}
               />
 
-              {/* Slider Handle */}
-              {/* <div 
-                className="absolute top-0 bottom-0 w-1 bg-gold z-10 before-after-handle"
-                style={{ left: `${sliderValue[0]}%` }}
-              >
-                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-10 h-10 bg-gold border-4 border-warm-white rounded-full shadow-lg flex items-center justify-center cursor-grab active:cursor-grabbing">
-                  <div className="w-3 h-3 bg-warm-white rounded-full"></div>
-                </div>
-              </div> */}
+             
 
               {/* Labels */}
               <div className="absolute top-4 left-4 bg-navy/80 text-warm-white px-3 py-1 rounded-full text-sm font-medium">

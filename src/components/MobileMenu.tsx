@@ -10,7 +10,7 @@ import { AuthButtonClientWrapper } from "./ui/AuthButtonClientWrapper";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import type {NavItem} from '@/components/Navbar'
 
-export function MobileMenu({navItems, userId}:{navItems:NavItem[], userId:string}) {
+export function MobileMenu({navItems, userId}:{navItems:NavItem[], userId:string | undefined}) {
   const [open, setOpen] = useState(false);
 
   // const navigation = [

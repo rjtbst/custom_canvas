@@ -1,6 +1,31 @@
+@import 'tui-image-editor/dist/tui-image-editor.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+
+/* For safety, hide nested input */
+
+.tui-image-editor-header {
+  display: none !important;
+}
+
+.tie-btn-delete{
+  display: none !important;
+}
+.tie-btn-deleteAll {
+  display: none !important;
+}
+/* Hide header logo */
+.tui-image-editor-header-logo {
+  display: none !important;
+}
+
+/* Shift header buttons after hiding logo */
+.tui-image-editor-header-buttons {
+  right: 0 !important;
+}
 
 /* Premium Art & Canvas Design System
 All colors MUST be HSL. Premium elegant styling with warm gold accents.
@@ -12,6 +37,8 @@ All colors MUST be HSL. Premium elegant styling with warm gold accents.
   padding: 2rem;
   text-align: center;
 }
+
+
 
 .logo {
   height: 6em;

@@ -11,6 +11,7 @@ const nextConfig: NextConfig = {
         pathname: '/storage/v1/object/**', // allow any path under storage
       },
     ],
+    domains:["photo-editor-uploads.s3.us-east-1.amazonaws.com"]
   },
 };
 
