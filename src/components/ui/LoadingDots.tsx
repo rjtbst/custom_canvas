@@ -33,7 +33,7 @@ export default function LoadingDots({
       aria-live="polite"
       aria-label={label}
       className={cn("loading-dots", className)}
-      style={{ ...(style || {}), ["--dot-size" as any]: dotSize }}
+      style={{ ...(style || {}), ["--dot-size" as keyof React.CSSProperties]: dotSize, }}
       {...props}
     >
       <span />

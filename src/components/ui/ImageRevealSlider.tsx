@@ -2,6 +2,7 @@
 
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { motion, useMotionValue, useTransform, animate } from 'framer-motion'
+import Image from 'next/image'
 
 export default function ImageRevealSlider({
   beforeSrc,
@@ -11,6 +12,8 @@ export default function ImageRevealSlider({
   className = '',
   initial = 50,
   handleSize = 44,
+  showSliderButton = false,
+  showPercentageBadge = true,
 }: {
   beforeSrc: string
   afterSrc: string
@@ -19,16 +22,40 @@ export default function ImageRevealSlider({
   className?: string
   initial?: number
   handleSize?: number
+  showSliderButton?:boolean
+  showPercentageBadge?:boolean
 }) {
   const trackRef = useRef<HTMLDivElement>(null)
+  const scrollContainerRef = useRef<HTMLElement | Window | null>(null)
   const [trackW, setTrackW] = useState(0)
   const x = useMotionValue(0)
   const half = handleSize / 2
   const handleX = useTransform(x, (v) => v - half)
   const [percent, setPercent] = useState(initial)
   const isDragging = useRef(false)
+  const dragStartX = useRef(0)
 
   const clamp = useCallback((v: number, min: number, max: number) => Math.min(Math.max(v, min), max), [])
+
+  // Find the nearest scrollable container
+  useLayoutEffect(() => {
+    const el = trackRef.current
+    if (!el) return
+    
+    let parent = el.parentElement
+    while (parent && parent !== document.body) {
+      const style = window.getComputedStyle(parent)
+      if (style.overflowY === 'scroll' || style.overflowY === 'auto' || style.overflow === 'scroll' || style.overflow === 'auto') {
+        scrollContainerRef.current = parent
+        break
+      }
+      parent = parent.parentElement
+    }
+    
+    if (!scrollContainerRef.current) {
+      scrollContainerRef.current = window
+    }
+  }, [])
 
   // Measure track width
   useLayoutEffect(() => {
@@ -60,6 +87,7 @@ export default function ImageRevealSlider({
   // Click anywhere on track
   const onTrackClick = useCallback(
     (e: React.MouseEvent<HTMLDivElement>) => {
+      if (isDragging.current) return
       const el = trackRef.current
       if (!el) return
       const rect = el.getBoundingClientRect()
@@ -96,20 +124,64 @@ export default function ImageRevealSlider({
     [handleSize]
   )
 
-  // Scroll-to-reveal but **skip if dragging**
+  // Enhanced scroll-to-reveal that works with any scrollable container
   useEffect(() => {
     const handleScroll = () => {
-      if (isDragging.current) return
+      if (isDragging.current || !trackW) return
+      
       const el = trackRef.current
       if (!el) return
+      
       const rect = el.getBoundingClientRect()
-      const vh = window.innerHeight
-      const visible = Math.min(Math.max((vh - rect.top) / (vh + rect.height), 0), 1)
+      const container = scrollContainerRef.current
+      
+      let visible = 0
+      
+      if (container === window || !container) {
+        // Window scroll behavior
+        const vh = window.innerHeight
+        visible = Math.min(Math.max((vh - rect.top) / (vh + rect.height), 0), 1)
+      } else {
+        // Container scroll behavior
+        const containerRect = (container as HTMLElement).getBoundingClientRect()
+        const containerHeight = containerRect.height
+        const relativeTop = rect.top - containerRect.top
+        const relativeBottom = relativeTop + rect.height
+        
+        if (relativeTop <= 0 && relativeBottom >= containerHeight) {
+          // Element spans entire container
+          visible = 0.5
+        } else if (relativeTop >= 0 && relativeBottom <= containerHeight) {
+          // Element fully visible
+          visible = (relativeTop + rect.height / 2) / containerHeight
+        } else if (relativeTop < 0) {
+          // Element entering from top
+          visible = Math.max(0, relativeBottom / containerHeight)
+        } else {
+          // Element entering from bottom
+          visible = Math.min(1, (containerHeight - relativeTop) / containerHeight)
+        }
+      }
+      
       x.set(visible * trackW)
     }
-    window.addEventListener('scroll', handleScroll, { passive: true })
-    handleScroll()
-    return () => window.removeEventListener('scroll', handleScroll)
+
+    const container = scrollContainerRef.current
+    if (container === window || !container) {
+      window.addEventListener('scroll', handleScroll, { passive: true })
+    } else {
+      (container as HTMLElement).addEventListener('scroll', handleScroll, { passive: true })
+    }
+    
+    handleScroll() // Initial call
+    
+    return () => {
+      if (container === window || !container) {
+        window.removeEventListener('scroll', handleScroll)
+      } else {
+        (container as HTMLElement).removeEventListener('scroll', handleScroll)
+      }
+    }
   }, [trackW, x])
 
   const beforeWidth = useTransform(x, (v) => `${clamp(v, 0, trackW)}px`)
@@ -124,14 +196,14 @@ export default function ImageRevealSlider({
         role="group"
       >
         {/* After image */}
-        <img src={afterSrc} alt={afterAlt} className="block h-full w-full object-cover select-none" draggable={false} />
+        <Image width={1200} height={800} src={afterSrc} alt={afterAlt} className="block h-full w-full object-cover select-none" draggable={false} />
 
         {/* Before image */}
         <motion.div
           className="absolute inset-0 overflow-hidden pointer-events-none will-change-[width]"
           style={{ width: beforeWidth }}
         >
-          <img src={beforeSrc} alt={beforeAlt} className="block h-full w-full object-cover select-none" draggable={false} />
+          <Image width={1200} height={800} src={beforeSrc} alt={beforeAlt} className="block h-full w-full object-cover select-none" draggable={false} />
         </motion.div>
 
         {/* Divider */}
@@ -140,8 +212,9 @@ export default function ImageRevealSlider({
         </motion.div>
 
         {/* Handle */}
+        {showSliderButton && (  
         <motion.button
-        suppressHydrationWarning
+          suppressHydrationWarning
           type="button"
           aria-label="Drag to reveal"
           role="slider"
@@ -149,16 +222,28 @@ export default function ImageRevealSlider({
           aria-valuemax={100}
           aria-valuenow={Math.round(percent)}
           className="absolute top-1/2 -translate-y-1/2 z-10 grid place-items-center rounded-full bg-white shadow-lg outline-none focus-visible:ring focus-visible:ring-blue-500 focus-visible:ring-offset-2"
-          style={{ ...handleStyle, x: handleX }}
           drag="x"
-          dragConstraints={{ left: 0, right: Math.max(0, trackW) }}
+          dragConstraints={{ left: -half, right: trackW - half }}
           dragElastic={0}
           dragMomentum={false}
-          onDragStart={() => { isDragging.current = true }}
-          onDragEnd={() => { isDragging.current = false }}
+          onDragStart={(event) => {
+            isDragging.current = true
+            const rect = trackRef.current!.getBoundingClientRect()
+            dragStartX.current = rect.left
+          }}
+          onDragEnd={() => {
+            isDragging.current = false
+          }}
           onDrag={(event, info) => {
-            // update MotionValue directly while dragging
-            x.set(clamp(info.point.x - trackRef.current!.getBoundingClientRect().left, 0, trackW))
+            if (!trackRef.current) return
+            const rect = trackRef.current.getBoundingClientRect()
+            const relativeX = info.point.x - rect.left
+            const newX = clamp(relativeX, 0, trackW)
+            x.set(newX)
+          }}
+          style={{
+            ...handleStyle,
+            x: handleX
           }}
           whileHover={{ scale: 1.04 }}
           whileTap={{ scale: 0.98 }}
@@ -169,12 +254,16 @@ export default function ImageRevealSlider({
             <path d="M12 8v8" />
           </svg>
         </motion.button>
+        )}
       </div>
 
       {/* Percentage badge */}
-      <div className="pointer-events-none absolute right-2 top-2 rounded-full bg-black/50 px-2 py-1 text-xs font-medium text-white">
+      {showPercentageBadge && (
+         <div className="pointer-events-none absolute right-2 top-2 rounded-full bg-black/50 px-2 py-1 text-xs font-medium text-white">
         {Math.round(percent)}%
       </div>
+        )}
+     
     </div>
   )
 }

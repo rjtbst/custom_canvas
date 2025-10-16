@@ -2,6 +2,8 @@ import { Button } from "@/components/ui/button";
 import { Wand2, Palette, Camera, Sparkles } from "lucide-react";
 
 const EditingFeatures = () => {
+    console.log("EditingFeatures************************")
+
   const features = [
     {
       icon: Wand2,
@@ -53,7 +55,7 @@ const EditingFeatures = () => {
             Editing Features
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Our beginner-friendly editor is powered by advanced AI to help you create stunning results without any design experience.
+            Our beginner-friendly editor is powered by advanced AI to help you create stunning results without unknown design experience.
           </p>
         </div>
 

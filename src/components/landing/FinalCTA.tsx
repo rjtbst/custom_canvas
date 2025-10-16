@@ -23,7 +23,7 @@ const FinalCTA = () => {
           {/* Headline */}
           <div className="space-y-4">
             <h2 className="text-3xl md:text-4xl lg:text-6xl font-bold leading-tight">
-              Don't let your memories fade.
+              Don&lsquo;t let your memories fade.
             </h2>
             <h3 className="text-2xl md:text-3xl lg:text-4xl font-semibold text-gold">
               Transform them into timeless art today.

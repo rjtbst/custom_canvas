@@ -1,147 +1,143 @@
-"use client"
-import { useState } from "react";
+"use client";
+
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Check, Frame, Image } from "lucide-react";
+import { Check, Frame } from "lucide-react";
+import Image from "next/image";
 import galleryWall from "@/assets/gallery-wall.jpg";
 
-const PrintOptions = () => {
-  const [selectedCategory, setSelectedCategory] = useState("canvas");
-  const [selectedSize, setSelectedSize] = useState("medium");
+import { Tab } from "../../lib/constants";
+import { usePrint } from "@/context/PrintProvider";
+import { pricingConfig } from "../../lib/constants";
+import type { CategoryConfig } from "@/lib/types";
 
-  const categories = [
-    {
-      id: "Acrylic",
-      name: "Acrylic frames",
-      icon: Image,
-      description: "High-quality photo prints on premium acrylic glass"
-    },
-    {
-      id: "canvas", 
-      name: "Canvas Prints",
-      icon: Frame,
-      description: "Museum-quality canvas with various mounting options"
-    }
-  ];
+interface PrintOptionsProps {
+  variant?: "landing" | "tab";
+  selectedTab?: Tab;
+  onSelectTab?: (tab: Tab) => void;
+}
 
-  const photoOptions = {
-    sizes: [
-      { id: "small", name: "Small", dimensions: "8x10", price: 15 },
-      { id: "medium", name: "Medium", dimensions: "11x14", price: 25 },
-      { id: "large", name: "Large", dimensions: "16x20", price: 45 }
-    ],
-    formats: [
-      // { id: "print-only", name: "Print Only", price: 0 },
-      { id: "framed", name: "With Acrylic Frame", price: 20, badge: "Hanging Ready" }
-    ]
-  };
+const PrintOptions = ({
+  variant = "landing",
+  selectedTab,
+  onSelectTab,
+}: PrintOptionsProps) => {
+  const {
+    category,
+    setCategory,
+    currentImage,
+    addToCart,
+    orientation,
+    setOrientation,
+    size,
+    setSize,
+  } = usePrint();
 
-  const canvasOptions = {
-    sizes: [
-      { id: "small", name: "Small", dimensions: "12x16", price: 45 },
-      { id: "medium", name: "Medium", dimensions: "16x20", price: 65 },
-      { id: "large", name: "Large", dimensions: "20x24", price: 95 }
-    ],
-    orientations: [
-      { id: "portrait", name: "Portrait" },
-      { id: "landscape", name: "Landscape" },
-      { id: "square", name: "Square" }
-    ],
-    mountings: [
-      { id: "rolled", name: "Rolled Canvas", price: 0 },
-      { id: "single", name: "Single Panel", price: 25 },
-      { id: "split", name: "Split Canvas", price: 45, badge: "Multi-panel" }
-    ]
-  };
+  const categoryConfig = pricingConfig[category];
+  const sizes = categoryConfig.sizes[orientation];
+  const getPrice = () => sizes.find((s) => s.id === size)?.price || 0;
 
-  const getPrice = () => {
-    const basePrice = selectedCategory === "canvas" 
-      ? canvasOptions.sizes.find(s => s.id === selectedSize)?.price || 0
-      : photoOptions.sizes.find(s => s.id === selectedSize)?.price || 0;
-    
-    return basePrice;
-  };
+  const isLanding = variant === "landing";
 
   return (
-    <section className=" bg-background">
-      <div className="container mx-auto px-6">
-        {/* Section Header */}
-        <div className="text-center mb-16 fade-in-up">
-          <div className="flex items-center justify-center gap-2 text-accent mb-4">
-            <Frame className="w-5 h-5" />
-            <span className="text-sm font-medium tracking-wide uppercase">Premium Printing</span>
+    <section
+      className={`rounded-xl flex  justify-center ${
+        isLanding ? "px-6 md:px-12 py-12 items-center" : ""
+      }`}
+    >
+      <div className={`${isLanding ? "container mx-auto" : "w-full"}`}>
+        {/* HEADER (Landing Only) */}
+        {isLanding && (
+          <div className="text-center mb-12 fade-in-up">
+            <div className="flex items-center justify-center gap-2 text-accent mb-4">
+              <Frame className="w-5 h-5" />
+              <span className="text-sm font-medium tracking-wide uppercase">
+                Premium Printing
+              </span>
+            </div>
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6">
+              Explore Print Options
+            </h2>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              Choose from our premium print options. Each piece is crafted using
+              the highest quality materials and professional printing
+              techniques.
+            </p>
           </div>
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6">
-            Explore Print Options
-          </h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Choose from our premium print options. Each piece is carefully crafted using the highest quality materials and professional printing techniques.
-          </p>
-        </div>
+        )}
 
-        <div className="grid lg:grid-cols-2 gap-12">
-          {/* Gallery Preview */}
-          <div className="fade-in-left">
-            <div className="relative rounded-2xl overflow-hidden shadow-2xl mb-6">
-              <img 
-                src={galleryWall.src} 
-                alt="Beautiful gallery wall showing various canvas prints and framed photos in a modern living room"
-                className="w-full h-auto"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-navy/40 to-transparent">
-                <div className="absolute bottom-6 left-6 text-warm-white">
-                  <h3 className="text-xl font-semibold mb-2">Gallery Wall Collection</h3>
-                  <p className="text-sm opacity-90">Mix and match different sizes for the perfect display</p>
+        <div
+          className={`${
+            isLanding ? "grid lg:grid-cols-2 gap-12" : "flex flex-col gap-6"
+          }`}
+        >
+          {/* LEFT SIDE IMAGE (Landing Only) */}
+          {isLanding && (
+            <div className="fade-in-left">
+              <div className="relative rounded-2xl overflow-hidden shadow-2xl mb-6">
+                <Image
+                  width={50}
+                  height={50}
+                  src={galleryWall.src}
+                  alt="Beautiful gallery wall"
+                  className="w-full h-auto"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-navy/40 to-transparent">
+                  <div className="absolute bottom-6 left-6 text-warm-white">
+                    <h3 className="text-xl font-semibold mb-2">
+                      Gallery Wall Collection
+                    </h3>
+                    <p className="text-sm opacity-90">
+                      Mix and match different sizes for the perfect display
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
+          )}
 
-            {/* Quality Features */}
-            <div className="grid grid-cols-2 gap-4">
-              <div className="bg-card p-4 rounded-xl shadow-soft">
-                <div className="text-accent font-semibold mb-1">Premium Materials</div>
-                <div className="text-sm text-muted-foreground">Archival quality papers and canvas</div>
-              </div>
-              <div className="bg-card p-4 rounded-xl shadow-soft">
-                <div className="text-accent font-semibold mb-1">Global Delivery</div>
-                <div className="text-sm text-muted-foreground">Worldwide shipping available</div>
-              </div>
-              <div className="bg-card p-4 rounded-xl shadow-soft">
-                <div className="text-accent font-semibold mb-1">100 Year Guarantee</div>
-                <div className="text-sm text-muted-foreground">Fade-resistant inks and materials</div>
-              </div>
-              <div className="bg-card p-4 rounded-xl shadow-soft">
-                <div className="text-accent font-semibold mb-1">Expert Craftsmanship</div>
-                <div className="text-sm text-muted-foreground">Hand-finished by professionals</div>
-              </div>
-            </div>
-          </div>
-
-          {/* Print Configuration */}
-          <div className="space-y-8 fade-in-right">
-            {/* Category Selection */}
+          {/* RIGHT SIDE CONFIG */}
+          <div className={`space-y-6 ${isLanding ? "fade-in-right" : ""}`}>
+            {/* CATEGORY SELECTION */}
             <div className="space-y-4">
-              <h3 className="text-xl font-semibold text-navy">Choose Print Type</h3>
-              <div className="grid grid-cols-1 gap-3">
-                {categories.map((category) => (
+              <div
+                className={`${
+                  isLanding
+                    ? "grid grid-cols-1 gap-3"
+                    : "flex items-center justify-center gap-2 flex-wrap"
+                }`}
+              >
+                {(Object.entries(pricingConfig) as [
+                  keyof typeof pricingConfig,
+                  CategoryConfig
+                ][]).map(([id, cat]) => (
                   <Button
-                    key={category.id}
-                    onClick={() => setSelectedCategory(category.id)}
-                    className={`p-4 rounded-xl border-2 transition-all text-left ${
-                      selectedCategory === category.id
-                        ? 'border-accent bg-accent/5'
-                        : 'border-border hover:border-accent/50'
+                    key={id}
+                    variant="outline"
+                    onClick={() => setCategory(id)}
+                    className={`py-6 rounded-xl border-2 transition-all text-left ${
+                      category === id
+                        ? "border-accent bg-accent/5"
+                        : "border-border hover:border-accent/50"
                     }`}
                   >
                     <div className="flex items-center gap-3">
-                      <category.icon className={`w-5 h-5 ${
-                        selectedCategory === category.id ? 'text-accent' : 'text-muted-foreground'
-                      }`} />
+                      <cat.icon
+                        className={`w-5 h-5 ${
+                          category === id
+                            ? "text-accent"
+                            : "text-muted-foreground"
+                        }`}
+                      />
                       <div>
-                        <div className="font-medium text-navy">{category.name}</div>
-                        <div className="text-sm text-muted-foreground">{category.description}</div>
+                        <div className="font-medium text-navy">{cat.name}</div>
+                        {isLanding && (
+                          <div className="text-sm text-muted-foreground">
+                            {cat.description}
+                          </div>
+                        )}
                       </div>
-                      {selectedCategory === category.id && (
+                      {category === id && (
                         <Check className="w-5 h-5 text-accent ml-auto" />
                       )}
                     </div>
@@ -150,95 +146,66 @@ const PrintOptions = () => {
               </div>
             </div>
 
-            {/* Size Selection */}
+            {/* ORIENTATION */}
+            <div className="space-y-3">
+              <h4 className="text-xl font-semibold text-navy text-center">Orientation</h4>
+              <div className="flex gap-2 justify-center flex-wrap">
+                {categoryConfig.orientations.map((o) => (
+                  <Badge
+                    key={o}
+                    variant={orientation === o ? "default" : "outline"}
+                    className="cursor-pointer text-sm font-medium px-4 py-1 rounded-3xl"
+                    onClick={() => setOrientation(o)}
+                  >
+                    {o}
+                  </Badge>
+                ))}
+              </div>
+            </div>
+
+            {/* SIZE OPTIONS */}
             <div className="space-y-4">
-              <h3 className="text-xl font-semibold text-navy">Select Size</h3>
+              <h3 className="text-xl text-center font-semibold text-navy">Select Size</h3>
               <div className="grid grid-cols-3 gap-3">
-                {(selectedCategory === "canvas" ? canvasOptions.sizes : photoOptions.sizes).map((size) => (
+                {sizes.map((s) => (
                   <Button
-                    key={size.id}
-                    variant={"outline"}
-                    onClick={() => setSelectedSize(size.id)}
+                    key={s.id}
+                    variant="outline"
+                    onClick={() => setSize(s.id)}
                     className={`p-4 rounded-xl border-2 transition-all text-center ${
-                      selectedSize === size.id
-                        ? 'border-accent bg-accent/5'
-                        : 'border-border hover:border-accent/50'
+                      size === s.id
+                        ? "border-accent bg-accent/5"
+                        : "border-border hover:border-accent/50"
                     }`}
                   >
-                    <div className="font-medium text-navy text-sm">{size.name}</div>
-                    <div className="text-xs text-muted-foreground">{size.dimensions}"</div>
-                    <div className="text-sm font-semibold text-accent mt-2">₹{size.price}</div>
+                    <div className="font-medium text-navy text-sm">{s.name}</div>
+                    <div className="text-xs text-muted-foreground">
+                      {s.dimensions}
+                    </div>
+                    <div className="text-sm font-semibold text-accent mt-2">
+                      ₹{s.price}
+                    </div>
                   </Button>
                 ))}
               </div>
             </div>
 
-            {/* Additional Options */}
-            {selectedCategory === "canvas" ? (
-              <div className="space-y-6">
-                {/* Orientation */}
-                <div className="space-y-3">
-                  <h4 className="font-medium text-navy">Orientation</h4>
-                  <div className="flex gap-2">
-                    {canvasOptions.orientations.map((orientation) => (
-                      <Badge key={orientation.id} variant="outline" className="cursor-pointer hover:bg-accent hover:text-navy">
-                        {orientation.name}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Mounting Options */}
-                <div className="space-y-3">
-                  <h4 className="font-medium text-navy">Mounting Option</h4>
-                  <div className="space-y-2">
-                    {canvasOptions.mountings.map((mounting) => (
-                      <div key={mounting.id} className="flex items-center justify-between p-3 rounded-lg border border-border hover:border-accent/50 cursor-pointer">
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm font-medium">{mounting.name}</span>
-                          {mounting.badge && (
-                            <Badge variant="secondary" className="text-xs">{mounting.badge}</Badge>
-                          )}
-                        </div>
-                        <span className="text-sm text-accent font-medium">
-                          {mounting.price === 0 ? "Included" : `+₹${mounting.price}`}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                <h4 className="font-medium text-navy">Format Options</h4>
-                <div className="space-y-2">
-                  {photoOptions.formats.map((format) => (
-                    <div key={format.id} className="flex items-center justify-between p-3 rounded-lg border border-border hover:border-accent/50 cursor-pointer">
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm font-medium">{format.name}</span>
-                        {format.badge && (
-                          <Badge variant="secondary" className="text-xs">{format.badge}</Badge>
-                        )}
-                      </div>
-                      <span className="text-sm text-accent font-medium">
-                        {format.price === 0 ? "Included" : `+₹${format.price}`}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Price Summary & CTA */}
-            <div className="bg-card p-6 rounded-xl shadow-soft">
+            {/* PRICE + BUTTON */}
+            <div className="bg-card p-4 rounded-xl shadow-soft">
               <div className="flex items-center justify-between mb-4">
-                <span className="text-lg font-semibold text-navy">Total Price</span>
-                <span className="text-2xl font-bold text-accent">₹{getPrice()}</span>
+                <span className="text-lg font-semibold text-navy">
+                  Total Price
+                </span>
+                <span className="text-2xl font-bold text-accent">
+                  ₹{getPrice()}
+                </span>
               </div>
-              
+
               <div className="space-y-2 text-sm text-muted-foreground mb-6">
                 <div className="flex justify-between">
-                  <span>Base Price ({selectedSize})</span>
+                  <span>
+                    Base Price ({size}, {orientation})
+                  </span>
                   <span>₹{getPrice()}</span>
                 </div>
                 <div className="flex justify-between">
@@ -247,13 +214,18 @@ const PrintOptions = () => {
                 </div>
               </div>
 
-              <Button variant="premium" size="lg" className="w-full">
+              <Button
+                variant="premium"
+                size="lg"
+                className="w-full"
+                disabled={!currentImage}
+                onClick={async () => {
+                  await addToCart();
+                  onSelectTab && onSelectTab("cart");
+                }}
+              >
                 Customize & Order Now
               </Button>
-              
-              <p className="text-xs text-muted-foreground text-center mt-3">
-                Free shipping on orders over ₹999 
-              </p>
             </div>
           </div>
         </div>

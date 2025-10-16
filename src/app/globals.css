@@ -1,6 +1,31 @@
+@import 'tui-image-editor/dist/tui-image-editor.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+
+/* For safety, hide nested input */
+
+.tui-image-editor-header {
+  display: none !important;
+}
+
+.tie-btn-delete{
+  display: none !important;
+}
+.tie-btn-deleteAll {
+  display: none !important;
+}
+/* Hide header logo */
+.tui-image-editor-header-logo {
+  display: none !important;
+}
+
+/* Shift header buttons after hiding logo */
+.tui-image-editor-header-buttons {
+  right: 0 !important;
+}
 
 /* Premium Art & Canvas Design System
 All colors MUST be HSL. Premium elegant styling with warm gold accents.
@@ -12,6 +37,8 @@ All colors MUST be HSL. Premium elegant styling with warm gold accents.
   padding: 2rem;
   text-align: center;
 }
+
+
 
 .logo {
   height: 6em;
@@ -246,13 +273,13 @@ All colors MUST be HSL. Premium elegant styling with warm gold accents.
       0 10px 25px -5px rgba(0, 0, 0, 0.1),
       0 4px 6px -2px rgba(0, 0, 0, 0.05),
       0 0 0 1px rgba(255, 255, 255, 0.1) inset;
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: 2px solid rgba(255, 255, 255, 0.2);
     background: linear-gradient(145deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.7));
     backdrop-filter: blur(10px);
   }
 
   .card-3d:hover {
-    transform: perspective(1000px) rotateX(5deg) rotateY(-5deg) translateY(-12px) scale(1.05);
+    transform: perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(-12px) scale(1.05);
     box-shadow: 
       0 35px 70px -15px rgba(0, 0, 0, 0.3),
       0 15px 25px -5px rgba(0, 0, 0, 0.15),

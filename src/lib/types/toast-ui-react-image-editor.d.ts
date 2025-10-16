@@ -1,0 +1,15 @@
+declare module '@toast-ui/react-image-editor' {
+  import { Component } from 'react';
+
+  export interface ImageEditorProps {
+    includeUI: any;
+    cssMaxHeight?: number;
+    cssMaxWidth?: number;
+    selectionStyle?: any;
+    usageStatistics?: boolean;
+  }
+
+  export default class ImageEditor extends Component<ImageEditorProps> {
+    getInstance(): any;
+  }
+}
