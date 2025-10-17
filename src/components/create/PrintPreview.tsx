@@ -8,9 +8,6 @@ export default function PrintPreview() {
   const { currentImage, category, orientation, size } = usePrint();
 console.log("Render PrintPreview with:", { currentImage, category, orientation, size });
   if (!currentImage || !currentImage.url) return null;
-
-  
-
  
   return (
   <div className="relative h-[90vh] rounded-md ">

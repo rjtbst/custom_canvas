@@ -14,12 +14,13 @@ import {
 } from '../ui/dialog'
 import { Button } from '@/components/ui/button'
 import ImageRevealSlider from '../ui/ImageRevealSlider'
+import { usePrint } from '@/context/PrintProvider'
 
 const TemplateGrid = () => {
   const [selectedTemplate, setSelectedTemplate] = useState<any>(null)
-
+  const {currentImage} = usePrint()
   return (
-    <div className=' grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-x-2  '>
+    <div className=' grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-x-2'>
       {edit_templates.map((template) => (
         <Dialog key={template.id}>
           <DialogTrigger asChild>
@@ -42,9 +43,7 @@ const TemplateGrid = () => {
             <DialogContent className='max-w-4xl text-center w-full'>
               <DialogHeader>
                 <DialogTitle className='text-lg font-semibold text-center'>{template.name}</DialogTitle>
-                {/* <DialogDescription>
-                  {template.prompt || 'No description provided.'}
-                </DialogDescription> */}
+               
               </DialogHeader>
 
               <div className='mt-4 flex flex-col md:flex-row gap-6'>
@@ -77,12 +76,14 @@ const TemplateGrid = () => {
                       className='w-full md:w-auto'
                       onClick={async () => {
                         try {
-                          const res = await fetch('/api/generate', {
+                          const res = await fetch('/api/comfyui', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({
                               templateId: template.id,
                               prompt: template.prompt,
+                              model: template.model,
+                              fileName: currentImage?.url, 
                             }),
                           })
                           const data = await res.json()
