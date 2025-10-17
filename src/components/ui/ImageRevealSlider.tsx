@@ -195,7 +195,7 @@ export default function ImageRevealSlider({
         aria-label="Before and after image comparison"
         role="group"
       >
-        {/* After image */}
+        {/* After image */} 
         <Image width={1200} height={800} src={afterSrc} alt={afterAlt} className="block h-full w-full object-cover select-none" draggable={false} />
 
         {/* Before image */}
